@@ -11,7 +11,7 @@ import wx.lib.buttons as buttons
 
 # jump_distance = 30
 
-def main():
+def backend():
     filename = input('Enter file name: ')
     path = 'test_files/' + filename
     # check file legitimacy
@@ -27,6 +27,9 @@ def main():
 
     player = MediaPlayer(path, 0, 100, 1.5)
     player.play_song()
+    time.sleep(20)
+    player.pause()
+    player.stop()
 
 
 # MediaPlayer -- the class that stores several functions to manipulate a song file
@@ -143,4 +146,4 @@ class MediaPlayer:
 
 
 if __name__ == '__main__':
-    main()
+    backend()
