@@ -1,35 +1,12 @@
 import datetime
-import os
 import pyglet
 import pyglet.media as media
-import sys
 import threading
-import time
 import winsound as ws
 import wx
 import wx.lib.buttons as buttons
 
 # jump_distance = 30
-
-def backend():
-    filename = input('Enter file name: ')
-    path = 'test_files/' + filename
-    # check file legitimacy
-    if not os.path.exists(path):
-        print('File not found; program terminated')
-        sys.exit()
-
-    # ws.PlaySound(path, ws.SND_FILENAME)
-
-    # music = pyglet.resource.media(path)
-    # music.play()
-    # pyglet.app.run()
-
-    player = MediaPlayer(path, 0, 100, 1.5)
-    player.play_song()
-    time.sleep(20)
-    player.pause()
-    player.stop()
 
 
 # MediaPlayer -- the class that stores several functions to manipulate a song file
@@ -63,17 +40,23 @@ class MediaPlayer:
 
     # pause the track
     def pause(self):
+        print('pausing...')
         self.player.pause()
+        print('...')
         return
 
     # play/continue the track
     def play(self):
+        print('playing song...')
         self.player.play()
+        print('...')
         return
 
     # reset the player
     def stop(self):
+        print('stopping...')
         self.reset_player()
+        print('...')
         return
 
     def now_(self):
@@ -131,7 +114,6 @@ class MediaPlayer:
             try:
                 src = media.load(self.path)
                 self.player.queue(src)
-                self.play()
 
                 self.songduration = self.duration_()  # Updating duration Time
                 return
@@ -143,7 +125,3 @@ class MediaPlayer:
             print(' [+] Error: Problem On Playing \n ', e)
             return
         return
-
-
-if __name__ == '__main__':
-    backend()
