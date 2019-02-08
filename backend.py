@@ -143,3 +143,8 @@ class MediaPlayer:
             print(' [+] Error: Problem On Playing \n ', e)
             return
         return
+
+    def set_vol(self, nvol):
+        print(nvol)
+        self.player.volume = nvol
+        return

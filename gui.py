@@ -22,6 +22,7 @@ def main():
     msg = 'Avideom'
     w1 = tk.Label(root, text=msg, justify=tk.LEFT, padx=10).pack(side='left')
 
+    # some standard media player buttons
     play = tk.PhotoImage(file='bitmaps/player_play.png')
     w2 = tk.Button(root, image=play, command=player.play).pack(side='bottom')
     pause = tk.PhotoImage(file='bitmaps/player_pause.png')
@@ -32,6 +33,8 @@ def main():
     w5 = tk.Button(root, image=ff, command=player.fast_forward).pack(side='bottom')
     rev = tk.PhotoImage(file='bitmaps/player_rev.png')
     w6 = tk.Button(root, image=rev, command=player.rewind).pack(side='bottom')
+    vol = tk.DoubleVar()
+    w7 = tk.Scale(root, from_=0, to=100, variable=vol, command=lambda x: player.set_vol(vol.get())).pack(side='bottom')
 
     root.mainloop()
 
