@@ -146,6 +146,5 @@ class MediaPlayer:
 
     # update volume from volume slider
     def set_vol(self, nvol):
-        print(self.player.volume)
         self.player.volume = nvol / 100.0
         return
