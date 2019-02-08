@@ -6,7 +6,7 @@ import winsound as ws
 import wx
 import wx.lib.buttons as buttons
 
-# jump_distance = 30
+jump_distance = 10
 
 
 # MediaPlayer -- the class that stores several functions to manipulate a song file
@@ -107,6 +107,24 @@ class MediaPlayer:
         k = datetime.timedelta(seconds=time)
         k = k.__str__()
         return k
+
+    def fast_forward(self):
+        time = self.player.time + jump_distance
+        try:
+            if self.duration() > time:
+                self.player.seek(time)
+            else:
+                self.player.seek(self.duration())
+        except AttributeError:
+            pass
+
+    def rewind(self):
+        time = self.player.time - jump_distance
+        print('rewinding...')
+        try:
+            self.player.seek(time)
+        except:
+            self.player.seek(0)
 
     def play_song(self, *args, **kwargs):
         try:

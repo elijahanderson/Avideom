@@ -29,9 +29,9 @@ def main():
     stop = tk.PhotoImage(file='bitmaps/player_stop.png')
     w4 = tk.Button(root, image=stop, command=player.stop).pack(side='bottom')
     ff = tk.PhotoImage(file='bitmaps/player_ff.png')
-    w5 = tk.Button(root, image=ff).pack(side='bottom')
+    w5 = tk.Button(root, image=ff, command=player.fast_forward).pack(side='bottom')
     rev = tk.PhotoImage(file='bitmaps/player_rev.png')
-    w6 = tk.Button(root, image=rev).pack(side='bottom')
+    w6 = tk.Button(root, image=rev, command=player.rewind).pack(side='bottom')
 
     root.mainloop()
 
