@@ -13,11 +13,11 @@ jump_distance = 10
 class MediaPlayer:
     def __init__(self, path, song_time, song_duration, volume):
         self.path = path
+        # volume is a float from 0 (mute) to 1 (normal volume)
         self.volume = volume
         self.songtime = song_time
         self.songduration = song_duration
         self.player = media.Player()    # the pyglet media player
-        self.player.volume = 1.5
         self.time_thread()              # time updating thread
 
         # to keep the private fields and media player in sync
@@ -144,7 +144,8 @@ class MediaPlayer:
             return
         return
 
+    # update volume from volume slider
     def set_vol(self, nvol):
-        print(nvol)
-        self.player.volume = nvol
+        print(self.player.volume)
+        self.player.volume = nvol / 100.0
         return
