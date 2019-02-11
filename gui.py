@@ -6,6 +6,7 @@ import backend
 
 
 def main():
+    # this file selection code will eventually be replaced with a file browsing system
     filename = input('Enter file name: ')
     path = 'test_files/' + filename
     # check file legitimacy
@@ -23,7 +24,7 @@ def main():
     msg = 'Avideom'
     w1 = tk.Label(root, text=msg, justify=tk.LEFT, padx=10).place(x=90, y=30)
 
-    # some standard media player buttons
+    # some standard media player functionalities
     play = tk.PhotoImage(file='bitmaps/player_play.png')
     w2 = tk.Button(root, image=play, command=player.play).place(x=10, y=150)
     pause = tk.PhotoImage(file='bitmaps/player_pause.png')
@@ -35,6 +36,7 @@ def main():
     rev = tk.PhotoImage(file='bitmaps/player_rev.png')
     w6 = tk.Button(root, image=rev, command=player.rewind).place(x=210, y=150)
     vol = tk.DoubleVar()
+    # using lambda here so I can pass in parameters
     w7 = tk.Scale(root, from_=0, to=100, variable=vol, command=lambda x: player.set_vol(vol.get())).place(x=10, y=30)
 
     root.mainloop()

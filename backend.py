@@ -9,7 +9,7 @@ import wx.lib.buttons as buttons
 jump_distance = 10
 
 
-# MediaPlayer -- the class that stores several functions to manipulate a song file
+# MediaPlayer -- a class that stores several functions to manipulate a song file
 class MediaPlayer:
     def __init__(self, path, song_time, song_duration, volume):
         self.path = path
@@ -59,12 +59,14 @@ class MediaPlayer:
         print('...')
         return
 
+    # return the current time, but as a string converted from the DateTime format
     def now_(self):
         currtime = int(self.now())
         k = datetime.timedelta(seconds=currtime)
         k = str(k)
         return k
 
+    # TODO -- delete this class and see if the app still runs
     def volume_(self, *args, **kwargs):
         try:
             volume = self.volume.get()
@@ -136,11 +138,11 @@ class MediaPlayer:
                 self.songduration = self.duration_()  # Updating duration Time
                 return
             except Exception as e:
-                print("[+] Something wrong when playing song", e)
+                print("Something wrong when playing song", e)
                 return
         except Exception as e:
-            print(' [+] Please Check Your File Path', self.path.get())
-            print(' [+] Error: Problem On Playing \n ', e)
+            print('Please Check Your File Path', self.path.get())
+            print('Error: Problem On Playing \n ', e)
             return
         return
 
