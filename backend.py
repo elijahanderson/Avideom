@@ -11,8 +11,8 @@ jump_distance = 10
 
 # MediaPlayer -- a class that stores several functions to manipulate a song file
 class MediaPlayer:
-    def __init__(self, path, song_time, song_duration, volume):
-        self.path = path
+    def __init__(self, song_time, song_duration, volume):
+        self.path = ''
         # volume is a float from 0 (mute) to 1 (normal volume)
         self.volume = volume
         self.songtime = song_time
@@ -149,4 +149,8 @@ class MediaPlayer:
     # update volume from volume slider
     def set_vol(self, nvol):
         self.player.volume = nvol / 100.0
+        return
+
+    def set_path(self, npath):
+        self.path = npath
         return
