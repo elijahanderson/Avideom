@@ -24,9 +24,7 @@ def main():
     # setting up GUI...
     root = tk.Tk()
     root.geometry('260x200+30+30')
-
-    msg = 'Avideom'
-    w1 = tk.Label(root, text=msg, justify=tk.LEFT, padx=10).place(x=90, y=30)
+    root.title('Avideom')
 
     # some standard media player functionalities
     play = tk.PhotoImage(file='bitmaps/player_play.png')
@@ -41,7 +39,8 @@ def main():
     w6 = tk.Button(root, image=rev, command=player.rewind).place(x=210, y=150)
     vol = tk.DoubleVar()
     # using lambda here so I can pass in parameters
-    w7 = tk.Scale(root, from_=0, to=100, variable=vol, command=lambda x: player.set_vol(vol.get())).place(x=10, y=30)
+    volume_slider = tk.Scale(root, from_=0, to=100, variable=vol, command=lambda x: player.set_vol(vol.get())).place(x=10, y=30)
+
 
     # creating the menu
     menu = tk.Menu(root)

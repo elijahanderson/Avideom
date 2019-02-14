@@ -6,6 +6,7 @@ import winsound as ws
 import wx
 import wx.lib.buttons as buttons
 
+# global var for fast forwarding/reverse speed
 jump_distance = 10
 
 
