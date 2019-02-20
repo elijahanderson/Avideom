@@ -60,7 +60,7 @@ class MediaPlayer:
         print('...')
         return
 
-    # return the current time, but as a string converted from the DateTime format
+    # return the current time, but as a string converted to "0:00:00" format
     def now_(self):
         currtime = int(self.now())
         k = datetime.timedelta(seconds=currtime)
@@ -135,15 +135,14 @@ class MediaPlayer:
             try:
                 src = media.load(self.path)
                 self.player.queue(src)
-
-                self.songduration = self.duration_()  # Updating duration Time
+                self.songduration = src.duration  # Updating duration Time
                 return
             except Exception as e:
-                print("Something wrong when playing song", e)
+                print("Something wrong when playing song -- ", e)
                 return
         except Exception as e:
-            print('Please Check Your File Path', self.path.get())
-            print('Error: Problem On Playing \n ', e)
+            print('Please Check Your File Path; ', self.path)
+            print('Error: Problem On Playing:\n ', e)
             return
         return
 
