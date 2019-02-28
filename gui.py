@@ -2,6 +2,7 @@ import os
 import tkinter as tk
 import tkinter.filedialog as fd
 import sys
+from tkinter import ttk
 # personal imports
 import backend
 
@@ -34,31 +35,33 @@ def main():
     # -------------------------------------------------------------------
     # setting up GUI...
     root = tk.Tk()
-    root.geometry('260x210+30+30')
+    root.geometry('260x230+30+30')
     root.title('Avideom')
+    s = ttk.Style()
+    s.configure('TScale', background='white', sliderlength=10)
 
     # some standard media player functionalities
     play = tk.PhotoImage(file='bitmaps/player_play.png')
-    w2 = tk.Button(root, image=play, command=player.play).place(x=10, y=150)
+    w2 = tk.Button(root, image=play, command=player.play, borderwidth=0).place(x=10, y=150)
     pause = tk.PhotoImage(file='bitmaps/player_pause.png')
-    w3 = tk.Button(root, image=pause, command=player.pause).place(x=60, y=150)
+    w3 = tk.Button(root, image=pause, command=player.pause, borderwidth=0).place(x=60, y=150)
     stop = tk.PhotoImage(file='bitmaps/player_stop.png')
-    w4 = tk.Button(root, image=stop, command=player.stop).place(x=110, y=150)
+    w4 = tk.Button(root, image=stop, command=player.stop, borderwidth=0).place(x=110, y=150)
     ff = tk.PhotoImage(file='bitmaps/player_ff.png')
-    w5 = tk.Button(root, image=ff, command=player.fast_forward).place(x=160, y=150)
+    w5 = tk.Button(root, image=ff, command=player.fast_forward, borderwidth=0).place(x=160, y=150)
     rev = tk.PhotoImage(file='bitmaps/player_rev.png')
-    w6 = tk.Button(root, image=rev, command=player.rewind).place(x=210, y=150)
+    w6 = tk.Button(root, image=rev, command=player.rewind, borderwidth=0).place(x=210, y=150)
 
     vol = tk.DoubleVar()
     # volume slider -- using lambda here so I can pass in parameters
-    volume_slider = tk.Scale(root, from_=0, to=100, variable=vol, command=lambda x: player.set_vol(vol.get())).place(x=10, y=30)
+    volume_slider = ttk.Scale(root, from_=0, to=100, variable=vol, orient='vertical', command=lambda x: player.set_vol(vol.get())).place(x=10, y=30)
 
     # time slider
     vtime = tk.IntVar()
     # TODO -- dragging slider changes player's songtime and updates song duration, but doesn't display curr time
-    time_slider = tk.Scale(root, from_=0, to=player.songduration, orient='horizontal', showvalue='yes', length=240, sliderlength=10,
-                           variable=vtime,
-                           command=lambda x: player.player.seek(vtime.get()), width=5)
+    time_slider = ttk.Scale(root, from_=0, to=player.songduration, orient='horizontal', length=240,
+                            variable=vtime,
+                            command=lambda x: player.player.seek(vtime.get()))
     time_slider.place(x=10, y=190)
 
     # creating the menu
@@ -76,6 +79,7 @@ def main():
     settings.add_command(label="General")
     settings.add_command(label="Radio")
 
+    root['bg'] = 'white'
     root.mainloop()
 
 
