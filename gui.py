@@ -69,7 +69,7 @@ class Main(tk.Tk):
             print('File not found; program terminated')
             sys.exit()
         player.set_path(path)
-        player.play_song()
+        player.play_media()
         print(player.songduration)
         time_slider.config(to=player.songduration)
 

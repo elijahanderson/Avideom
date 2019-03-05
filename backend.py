@@ -129,7 +129,7 @@ class MediaPlayer:
         except:
             self.player.seek(0)
 
-    def play_song(self, *args, **kwargs):
+    def play_media(self, *args, **kwargs):
         try:
             self.reset_player()
             try:
