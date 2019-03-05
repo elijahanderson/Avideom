@@ -1,7 +1,8 @@
 import datetime
-import pyglet
+import pyglet as pyg
 import pyglet.media as media
 import threading
+import vlc
 import winsound as ws
 import wx
 import wx.lib.buttons as buttons
@@ -134,6 +135,14 @@ class MediaPlayer:
             self.reset_player()
             try:
                 src = media.load(self.path)
+                if src.video_format is not None:
+                    print(src.video_format)
+                    instance = vlc.Instance()
+                    vlc_player = instance.media_player_new()
+                    vlc_media = instance.media_new(self.path)
+                    vlc_media.get_mrl()
+                    vlc_player.set_media(vlc_media)
+                    vlc_player.play()
                 self.player.queue(src)
                 self.songduration = src.duration  # Updating duration Time
                 return
@@ -144,7 +153,6 @@ class MediaPlayer:
             print('Please Check Your File Path; ', self.path)
             print('Error: Problem On Playing:\n ', e)
             return
-        return
 
     # update volume from volume slider
     def set_vol(self, nvol):
