@@ -135,8 +135,8 @@ class MediaPlayer:
             self.reset_player()
             try:
                 src = media.load(self.path)
+                # use vlc module to play videos
                 if src.video_format is not None:
-                    print(src.video_format)
                     instance = vlc.Instance()
                     vlc_player = instance.media_player_new()
                     vlc_media = instance.media_new(self.path)
