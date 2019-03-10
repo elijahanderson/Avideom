@@ -55,7 +55,7 @@ class Main(tk.Tk):
         file_tab.add_separator()
         file_tab.add_command(label="Exit", command=root.quit)
         # settings tab layout
-        settings.add_command(label="General")
+        settings.add_command(label="General", command=self.open_settings)
         settings.add_command(label="Radio")
 
         root['bg'] = 'white'
@@ -73,6 +73,10 @@ class Main(tk.Tk):
         print(player.songduration)
         time_slider.config(to=player.songduration)
 
+    def open_settings(self):
+        settings_app = Settings(tk.Tk())
+        settings_app.mainloop()
+
     # to convert between actual no. seconds and display time
     def conv_time(self, disp_time):
         time_list = disp_time.split(':')
@@ -80,6 +84,16 @@ class Main(tk.Tk):
         total_sec = (int(time_list[0])*60) + (int(time_list[1])) + (int(time_list[2])/60)
         print(total_sec)
         return total_sec
+
+
+class Settings(tk.Tk):
+    def __init__(self, root):
+        self.root = root
+        root.geometry('260x230+30+30')
+        root.title('General Settings')
+        root['bg'] = 'white'
+
+        root.mainloop()
 
 
 if __name__ == '__main__':
