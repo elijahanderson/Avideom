@@ -54,6 +54,14 @@ class MediaPlayer:
         print('...')
         return
 
+    # play multiple tracks
+    def play_multi(self):
+        print('playing multiple songs')
+        print(self.player.source.duration)
+        self.songduration = self.player.source.duration
+        self.player.play()
+        return
+
     # reset the player
     def stop(self):
         print('stopping...')
