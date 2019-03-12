@@ -143,15 +143,15 @@ class Settings(tk.Tk):
         return
 
 
+# Create a tooltip for any given widget
+# From https://www.daniweb.com/programming/software-development/code/484591/a-tooltip-class-for-tkinter
 class CreateToolTip(object):
-    '''
-    create a tooltip for a given widget
-    '''
     def __init__(self, widget, text='widget info'):
         self.widget = widget
         self.text = text
         self.widget.bind("<Enter>", self.enter)
         self.widget.bind("<Leave>", self.close)
+
     def enter(self, event=None):
         time.sleep(1)
         x = y = 0
@@ -167,9 +167,11 @@ class CreateToolTip(object):
                        background='cyan', relief='solid', borderwidth=0,
                        font=("calibri", "10", "normal"))
         label.pack(ipadx=1)
+
     def close(self, event=None):
         if self.tw:
             self.tw.destroy()
+
 
 if __name__ == '__main__':
     app = Main(tk.Tk())
