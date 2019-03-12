@@ -5,6 +5,7 @@ import tkinter as tk
 import tkinter.filedialog as fd
 import time
 import sys
+from random import shuffle
 from tkinter import ttk
 from tkinter import simpledialog
 # personal imports
@@ -46,6 +47,10 @@ class Main(tk.Tk):
         w6 = tk.Button(root, image=rev, command=player.rewind, borderwidth=0)
         w6.place(x=210, y=150)
         w6tt = CreateToolTip(w6, 'Reverse')
+        shuffle = tk.PhotoImage(file='bitmaps/shuffle.png')
+        w7 = tk.Button(root, image=shuffle, command=lambda: self.shuffle(player), borderwidth=0)
+        w7.place(x=210, y=100)
+        w7tt = CreateToolTip(w7, 'Shuffle and play playlist')
 
         vol = tk.DoubleVar()
         # volume slider -- using lambda here so I can pass in parameters
@@ -79,6 +84,22 @@ class Main(tk.Tk):
         root['bg'] = 'white'
         root.mainloop()
 
+    # shuffle and play a playlist
+    def shuffle(self, player):
+        folder = fd.askdirectory()
+        for root, dirs, files in os.walk(folder):
+            print(files)
+            shuffle(files)
+            print(files)
+            for filename in files:
+                path = os.path.join(root, str(filename))
+                if not os.path.exists(path):
+                    print('File not found; program terminated')
+                    sys.exit()
+                src = media.load(path, streaming=True)
+                player.player.queue(src)
+        player.play()
+
     # open single file
     def open_file(self, player, time_slider):
         filename = fd.askopenfilename()
@@ -94,7 +115,6 @@ class Main(tk.Tk):
     # open multiple files
     def open_files(self, player, time_slider):
         files = fd.askopenfilenames()
-        print(files)
         # check file legitimacy
         for filename in files:
             path = str(filename)
@@ -155,6 +175,7 @@ class PopupEntry(tk.Tk):
 
 
 # TODO -- come up with more settings for user to edit
+#       TODO -- create 'Edit Playlist' button
 class Settings(tk.Tk):
     def __init__(self, root):
         self.root = root
