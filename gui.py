@@ -23,15 +23,25 @@ class Main(tk.Tk):
 
         # some standard media player functionalities
         play = tk.PhotoImage(file='bitmaps/player_play.png')
-        w2 = tk.Button(root, image=play, command=player.play, borderwidth=0).place(x=10, y=150)
+        w2 = tk.Button(root, image=play, command=player.play, borderwidth=0)
+        w2.place(x=10, y=150)
+        w2tt = CreateToolTip(w2, 'Play')
         pause = tk.PhotoImage(file='bitmaps/player_pause.png')
-        w3 = tk.Button(root, image=pause, command=player.pause, borderwidth=0).place(x=60, y=150)
+        w3 = tk.Button(root, image=pause, command=player.pause, borderwidth=0)
+        w3.place(x=60, y=150)
+        w3tt = CreateToolTip(w3, 'Pause')
         next = tk.PhotoImage(file='bitmaps/player_next.png')
-        w4 = tk.Button(root, image=next, command=player.player.next_source, borderwidth=0).place(x=110, y=150)
+        w4 = tk.Button(root, image=next, command=player.player.next_source, borderwidth=0)
+        w4.place(x=110, y=150)
+        w4tt = CreateToolTip(w4, 'Skip')
         ff = tk.PhotoImage(file='bitmaps/player_ff.png')
-        w5 = tk.Button(root, image=ff, command=player.fast_forward, borderwidth=0).place(x=160, y=150)
+        w5 = tk.Button(root, image=ff, command=player.fast_forward, borderwidth=0)
+        w5.place(x=160, y=150)
+        w5tt = CreateToolTip(w5, 'Fast foward')
         rev = tk.PhotoImage(file='bitmaps/player_rev.png')
-        w6 = tk.Button(root, image=rev, command=player.rewind, borderwidth=0).place(x=210, y=150)
+        w6 = tk.Button(root, image=rev, command=player.rewind, borderwidth=0)
+        w6.place(x=210, y=150)
+        w6tt = CreateToolTip(w6, 'Reverse')
 
         vol = tk.DoubleVar()
         # volume slider -- using lambda here so I can pass in parameters
@@ -132,6 +142,34 @@ class Settings(tk.Tk):
     def on_equalizer(self):
         return
 
+
+class CreateToolTip(object):
+    '''
+    create a tooltip for a given widget
+    '''
+    def __init__(self, widget, text='widget info'):
+        self.widget = widget
+        self.text = text
+        self.widget.bind("<Enter>", self.enter)
+        self.widget.bind("<Leave>", self.close)
+    def enter(self, event=None):
+        time.sleep(1)
+        x = y = 0
+        x, y, cx, cy = self.widget.bbox("insert")
+        x += self.widget.winfo_rootx() + 30
+        y += self.widget.winfo_rooty() + 20
+        # creates a toplevel window
+        self.tw = tk.Toplevel(self.widget)
+        # Leaves only the label and removes the app window
+        self.tw.wm_overrideredirect(True)
+        self.tw.wm_geometry("+%d+%d" % (x, y))
+        label = tk.Label(self.tw, text=self.text, justify='left',
+                       background='cyan', relief='solid', borderwidth=0,
+                       font=("calibri", "10", "normal"))
+        label.pack(ipadx=1)
+    def close(self, event=None):
+        if self.tw:
+            self.tw.destroy()
 
 if __name__ == '__main__':
     app = Main(tk.Tk())
