@@ -1,10 +1,12 @@
 import os
 import pyglet.media as media
+import shutil
 import tkinter as tk
 import tkinter.filedialog as fd
 import time
 import sys
 from tkinter import ttk
+from tkinter import simpledialog
 # personal imports
 import backend
 
@@ -31,6 +33,8 @@ class Main(tk.Tk):
         w3.place(x=60, y=150)
         w3tt = CreateToolTip(w3, 'Pause')
         next = tk.PhotoImage(file='bitmaps/player_next.png')
+        # TODO -- put command in its own function and wrap a try-catch loop around it
+        # IndexError when no sources queued up
         w4 = tk.Button(root, image=next, command=player.player.next_source, borderwidth=0)
         w4.place(x=110, y=150)
         w4tt = CreateToolTip(w4, 'Skip')
@@ -64,9 +68,8 @@ class Main(tk.Tk):
         menu.add_cascade(label="Settings", menu=settings)
         # file tab layout
         media_tab.add_command(label="Open File...", command=lambda: self.open_file(player, time_slider))
-        # TODO -- add actual functionality for opening multiple files
         media_tab.add_command(label="Open Multiple Files...", command=lambda: self.open_files(player, time_slider))
-        media_tab.add_command(label="Open Folder...", command=lambda: self.open_file(player, time_slider))
+        media_tab.add_command(label="Open Playlist...", command=lambda: self.open_playlist(player, time_slider))
         media_tab.add_separator()
         media_tab.add_command(label="Exit", command=lambda: self.exit(root))
         # settings tab layout
@@ -91,6 +94,7 @@ class Main(tk.Tk):
     # open multiple files
     def open_files(self, player, time_slider):
         files = fd.askopenfilenames()
+        print(files)
         # check file legitimacy
         for filename in files:
             path = str(filename)
@@ -99,9 +103,21 @@ class Main(tk.Tk):
                 sys.exit()
             src = media.load(path, streaming=True)
             player.player.queue(src)
-        print(player.player.source)
         player.play()
         # player.player.next_source()
+
+    # open a playlist (a folder)
+    def open_playlist(self, player, time_slider):
+        folder = fd.askdirectory()
+        for root, dirs, files in os.walk(folder):
+            for filename in files:
+                path = os.path.join(root, str(filename))
+                if not os.path.exists(path):
+                    print('File not found; program terminated')
+                    sys.exit()
+                src = media.load(path, streaming=True)
+                player.player.queue(src)
+        player.play()
 
     def open_settings(self):
         settings_app = Settings(tk.Tk())
@@ -120,9 +136,29 @@ class Main(tk.Tk):
         sys.exit()
 
 
+# Popup window for playlist creation
+class PopupEntry(tk.Tk):
+    def __init__(self, root):
+        top = self.top = tk.Toplevel(root)
+        self.value = ''
+        self.root = root
+        self.l = tk.Label(top, text='Enter playlist name:')
+        self.l.pack()
+        self.e = tk.Entry(top)
+        self.e.pack()
+        self.b = tk.Button(top, text='Ok', command=self.destroy)
+        self.b.pack()
+
+    def destroy(self):
+        self.value = self.e.get()
+        self.top.destroy()
+
+
+# TODO -- come up with more settings for user to edit
 class Settings(tk.Tk):
     def __init__(self, root):
         self.root = root
+        self.playlist_name = ''
         root.geometry('260x230+30+30')
         root.title('General Settings')
         root['bg'] = 'white'
@@ -137,10 +173,28 @@ class Settings(tk.Tk):
         root.mainloop()
 
     def create_playlist(self):
+        # popup = PopupEntry(tk.Tk())
+        # popup.wait_window(popup.top)
+        self.playlist_name = simpledialog.askstring('Avideom', 'Enter playlist name:')
+        print(self.playlist_name)
+        files = fd.askopenfilenames()
+        proj_path = 'D:/Programming/Python/Avideom/' + self.playlist_name
+        if not os.path.exists(proj_path):
+            os.makedirs(proj_path)
+        for filename in files:
+            path = str(filename)
+            # check legitimacy
+            if not os.path.exists(path):
+                print('File not found; program terminated')
+                sys.exit()
+            shutil.copy2(filename, proj_path)
         return
 
     def on_equalizer(self):
         return
+
+    def set_playlist_name(self, pname):
+        self.playlist_name = pname
 
 
 # Create a tooltip for any given widget
