@@ -11,6 +11,8 @@ from tkinter import simpledialog
 # personal imports
 import backend
 
+# root directory of Avideom
+AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class Main(tk.Tk):
     def __init__(self, root):
@@ -183,23 +185,21 @@ class Settings(tk.Tk):
         root.geometry('260x230+30+30')
         root.title('General Settings')
         root['bg'] = 'white'
-        s = ttk.Style()
-        # s.configure('TButton', background='white')
 
-        playlist = tk.Button(root, command=self.create_playlist, text='Create playlist', bg='white', borderwidth=1)\
+        create_playlist = tk.Button(root, command=self.create_playlist, text='Create playlist', bg='white', borderwidth=1)\
             .place(x=10, y=10)
-        equalizer = tk.Button(root, command=self.on_equalizer, text='Equalizer', bg='white', borderwidth=1)\
+        edit_playlist = tk.Button(root, command=self.edit_playlist, text='Edit Playlist', bg='white', borderwidth=1)\
             .place(x=10, y=40)
+        equalizer = tk.Button(root, command=self.on_equalizer, text='Equalizer', bg='white', borderwidth=1)\
+            .place(x=10, y=70)
 
         root.mainloop()
 
     def create_playlist(self):
-        # popup = PopupEntry(tk.Tk())
-        # popup.wait_window(popup.top)
         self.playlist_name = simpledialog.askstring('Avideom', 'Enter playlist name:')
-        print(self.playlist_name)
+        # TODO -- if user cancels dialog, exit out to main app
         files = fd.askopenfilenames()
-        proj_path = 'D:/Programming/Python/Avideom/' + self.playlist_name
+        proj_path = AVIDEOM_DIR + '/playlists/' + self.playlist_name
         if not os.path.exists(proj_path):
             os.makedirs(proj_path)
         for filename in files:
@@ -211,11 +211,63 @@ class Settings(tk.Tk):
             shutil.copy2(filename, proj_path)
         return
 
+    def edit_playlist(self):
+        try:
+            edit_app = PlaylistEdit(tk.Tk())
+            edit_app.mainloop()
+        except RecursionError:
+            print()
+        return
+
     def on_equalizer(self):
         return
 
     def set_playlist_name(self, pname):
         self.playlist_name = pname
+
+
+# Window for editing playlists
+class PlaylistEdit(tk.Tk):
+    def __init__(self, root):
+        self.root = root
+        root.title('Edit Playlist')
+        root.geometry('260x230+30+30')
+        root['bg'] = 'white'
+        s = ttk.Style()
+        s.configure('TOptionMenu', background='white')
+        playlists = os.listdir(AVIDEOM_DIR + '/playlists/')
+
+        self.var = tk.StringVar()
+        self.var.set(playlists[0])
+        self.var.trace('w', self.change_dropdown)
+
+        w = tk.OptionMenu(root, self.var, *playlists)
+        tk.Label(root, text='Choose playlist', bg='white').place(x=50, y=10)
+        w.place(x=50, y=30)
+
+        edit_btn = tk.Button(root, text='Edit', bg='white', borderwidth=1, command=lambda: self.on_edit(self.var.get()))
+        edit_btn.place(x=50, y=60)
+
+    def change_dropdown(self, *args):
+        print(self.var.get())
+
+    def on_edit(self, playlist):
+        try:
+            edit_app = PlaylistEdit2(tk.Tk(), playlist)
+            edit_app.mainloop()
+        except RecursionError:
+            print()
+
+
+class PlaylistEdit2(tk.Tk):
+    def __init__(self, root, playlist):
+        self.root = root
+        root.title(playlist)
+        root.geometry('260x230+30+30')
+        root['bg'] = 'white'
+
+        songlist = os.listdir(AVIDEOM_DIR + '/playlists/' + playlist)
+        print(songlist)
 
 
 # Create a tooltip for any given widget
