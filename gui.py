@@ -3,6 +3,7 @@ import pyglet.media as media
 import shutil
 import tkinter as tk
 import tkinter.filedialog as fd
+import tkinter.messagebox as mb
 import time
 import sys
 from random import shuffle
@@ -177,12 +178,11 @@ class PopupEntry(tk.Tk):
 
 
 # TODO -- come up with more settings for user to edit
-#       TODO -- create 'Edit Playlist' button
 class Settings(tk.Tk):
     def __init__(self, root):
         self.root = root
         self.playlist_name = ''
-        root.geometry('260x230+30+30')
+        root.geometry('260x100+30+30')
         root.title('General Settings')
         root['bg'] = 'white'
 
@@ -196,19 +196,27 @@ class Settings(tk.Tk):
         root.mainloop()
 
     def create_playlist(self):
+        # ask for name -- display error and exit settings if playlist name already exists
         self.playlist_name = simpledialog.askstring('Avideom', 'Enter playlist name:')
-        # TODO -- if user cancels dialog, exit out to main app
-        files = fd.askopenfilenames()
-        proj_path = AVIDEOM_DIR + '/playlists/' + self.playlist_name
-        if not os.path.exists(proj_path):
-            os.makedirs(proj_path)
-        for filename in files:
-            path = str(filename)
-            # check legitimacy
-            if not os.path.exists(path):
-                print('File not found; program terminated')
-                sys.exit()
-            shutil.copy2(filename, proj_path)
+        if self.playlist_name is not None:
+            proj_path = AVIDEOM_DIR + '/playlists/' + self.playlist_name
+            if not os.path.exists(proj_path):
+                os.makedirs(proj_path)
+            else:
+                mb.showinfo('Error', 'This playlist name already exists -- please try a different name.')
+                self.root.destroy()
+                return
+
+            # TODO -- if user cancels dialog, exit out to main app
+            files = fd.askopenfilenames()
+            for filename in files:
+                path = str(filename)
+                # check legitimacy
+                if not os.path.exists(path):
+                    print('File not found; program terminated')
+                    sys.exit()
+                shutil.copy2(filename, proj_path)
+            self.root.destroy()
         return
 
     def edit_playlist(self):
@@ -231,25 +239,28 @@ class PlaylistEdit(tk.Tk):
     def __init__(self, root):
         self.root = root
         root.title('Edit Playlist')
-        root.geometry('260x230+30+30')
+        root.geometry('260x120+10+10')
         root['bg'] = 'white'
         s = ttk.Style()
         s.configure('TOptionMenu', background='white')
         playlists = os.listdir(AVIDEOM_DIR + '/playlists/')
 
-        self.var = tk.StringVar()
-        self.var.set(playlists[0])
-        self.var.trace('w', self.change_dropdown)
+        var = tk.StringVar(root)
+        var.set(playlists[0])
+        var.trace('w', self.change_dropdown)
 
-        w = tk.OptionMenu(root, self.var, *playlists)
-        tk.Label(root, text='Choose playlist', bg='white').place(x=50, y=10)
-        w.place(x=50, y=30)
+        w = ttk.OptionMenu(root, var, playlists[0], *playlists)
+        tk.Label(root, text='Choose playlist to edit:', bg='white').place(x=10, y=10)
+        w.place(x=10, y=30)
 
-        edit_btn = tk.Button(root, text='Edit', bg='white', borderwidth=1, command=lambda: self.on_edit(self.var.get()))
-        edit_btn.place(x=50, y=60)
+        edit_btn = tk.Button(root, text='Edit', bg='white', borderwidth=1, command=lambda: self.on_edit(var.get()))
+        edit_btn.place(x=10, y=60)
+
+        dlt_btn = tk.Button(root, text='Delete', bg='white', borderwidth=1, command=lambda: self.on_delete(var.get()))
+        dlt_btn.place(x=10, y=90)
 
     def change_dropdown(self, *args):
-        print(self.var.get())
+        return
 
     def on_edit(self, playlist):
         try:
@@ -258,17 +269,45 @@ class PlaylistEdit(tk.Tk):
         except RecursionError:
             print()
 
+    def on_delete(self, playlist):
+        path = AVIDEOM_DIR + '/playlists/' + playlist
+        shutil.rmtree(path)
+
 
 class PlaylistEdit2(tk.Tk):
     def __init__(self, root, playlist):
         self.root = root
+        self.playlist_path = AVIDEOM_DIR + '/playlists/' + playlist
+        var = tk.StringVar(root)
         root.title(playlist)
-        root.geometry('260x230+30+30')
+        root.geometry('260x120+10+10')
         root['bg'] = 'white'
 
-        songlist = os.listdir(AVIDEOM_DIR + '/playlists/' + playlist)
-        print(songlist)
+        songlist = os.listdir(self.playlist_path)
+        var.set(songlist[0])
+        var.trace('w', self.change_dropdown)
+        w = ttk.OptionMenu(root, var, songlist[0], *songlist)
+        w.place(x=10, y=30)
 
+        tk.Label(root, text='Choose song to edit:', bg='white').place(x=10, y=10)
+        add = tk.Button(root, text='Add song', bg='white', borderwidth=1, command=self.add_song).place(x=10, y=60)
+        dlt = tk.Button(root, text='Delete song', bg='white', borderwidth=1,
+                        command=lambda: self.del_song(var.get())).place(x=10, y=90)
+
+    def add_song(self):
+        filename = fd.askopenfilename()
+        path = str(filename)
+        # check file legitimacy
+        if not os.path.exists(path):
+            print('File not found; program terminated')
+            sys.exit()
+        shutil.copy2(path, self.playlist_path)
+
+    def del_song(self, song):
+        os.remove(self.playlist_path + '/' + song)
+
+    def change_dropdown(self, *args):
+        return
 
 # Create a tooltip for any given widget
 # From https://www.daniweb.com/programming/software-development/code/484591/a-tooltip-class-for-tkinter
