@@ -1,11 +1,7 @@
 import datetime
-import pyglet as pyg
 import pyglet.media as media
 import threading
 import vlc
-import winsound as ws
-import wx
-import wx.lib.buttons as buttons
 
 # global var for fast forwarding/reverse speed
 jump_distance = 10
@@ -85,7 +81,7 @@ class MediaPlayer:
             pass
         return
 
-    # [fill this in]
+    # to keep time consistent
     def time_thread(self):
         threading.Thread(target=self.update_time).start()
         return
@@ -107,6 +103,7 @@ class MediaPlayer:
         self.player.delete()
         return
 
+    # return the duration of the current source
     def duration(self):
         try:
             storeobj = self.player.source.duration
@@ -120,6 +117,7 @@ class MediaPlayer:
         k = k.__str__()
         return k
 
+    # fast forward current source according to the jump distance
     def fast_forward(self):
         time = self.player.time + jump_distance
         try:
@@ -130,6 +128,7 @@ class MediaPlayer:
         except AttributeError:
             pass
 
+    # rewind current source according to the jump distance
     def rewind(self):
         time = self.player.time - jump_distance
         print('rewinding...')
@@ -138,6 +137,7 @@ class MediaPlayer:
         except:
             self.player.seek(0)
 
+    # reset the play and queue up a source
     def play_media(self, *args, **kwargs):
         try:
             self.reset_player()
@@ -167,6 +167,7 @@ class MediaPlayer:
         self.player.volume = nvol / 100.0
         return
 
+    # update current source path
     def set_path(self, npath):
         self.path = npath
         return

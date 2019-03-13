@@ -1,11 +1,11 @@
 import os
 import pyglet.media as media
 import shutil
+import sys
 import tkinter as tk
 import tkinter.filedialog as fd
 import tkinter.messagebox as mb
 import time
-import sys
 from random import shuffle
 from tkinter import ttk
 from tkinter import simpledialog
@@ -15,51 +15,69 @@ import backend
 # root directory of Avideom
 AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 class Main(tk.Tk):
     def __init__(self, root):
+        # the media player backend
         player = backend.MediaPlayer(0, 100, 1.5)
 
         # -------------------------------------------------------------------
+
         # setting up GUI...
         self.root = root
         root.geometry('260x230+30+30')
         root.title('Avideom')
+        root['bg'] = 'white'
         s = ttk.Style()
         s.configure('TScale', background='white', sliderlength=10)
 
-        # some standard media player functionalities
+        ################################################
+        # [some standard media player functionalities] #
+        ################################################
+
+        # PLAY
         play = tk.PhotoImage(file='bitmaps/player_play.png')
         w2 = tk.Button(root, image=play, command=player.play, borderwidth=0)
         w2.place(x=10, y=150)
         w2tt = CreateToolTip(w2, 'Play')
+
+        # PAUSE
         pause = tk.PhotoImage(file='bitmaps/player_pause.png')
         w3 = tk.Button(root, image=pause, command=player.pause, borderwidth=0)
         w3.place(x=60, y=150)
         w3tt = CreateToolTip(w3, 'Pause')
+
+        # NEXT SOURCE
         next = tk.PhotoImage(file='bitmaps/player_next.png')
         # TODO -- put command in its own function and wrap a try-catch loop around it
         # IndexError when no sources queued up
         w4 = tk.Button(root, image=next, command=player.player.next_source, borderwidth=0)
         w4.place(x=110, y=150)
         w4tt = CreateToolTip(w4, 'Skip')
+
+        # FAST FORWARD
         ff = tk.PhotoImage(file='bitmaps/player_ff.png')
         w5 = tk.Button(root, image=ff, command=player.fast_forward, borderwidth=0)
         w5.place(x=160, y=150)
         w5tt = CreateToolTip(w5, 'Fast foward')
+
+        # REVERSE
         rev = tk.PhotoImage(file='bitmaps/player_rev.png')
         w6 = tk.Button(root, image=rev, command=player.rewind, borderwidth=0)
         w6.place(x=210, y=150)
         w6tt = CreateToolTip(w6, 'Reverse')
-        shuffle = tk.PhotoImage(file='bitmaps/shuffle.png')
-        w7 = tk.Button(root, image=shuffle, command=lambda: self.shuffle(player), borderwidth=0)
+
+        # SHUFFLE AND PLAY
+        shuffle_btn = tk.PhotoImage(file='bitmaps/shuffle.png')
+        w7 = tk.Button(root, image=shuffle_btn, command=lambda: self.shuffle(player), borderwidth=0)
         w7.place(x=210, y=100)
         w7tt = CreateToolTip(w7, 'Shuffle and play playlist')
 
+        # VOLUME SLIDER -- using lambda is used to pass parameters without running the fnc upon app start
         vol = tk.DoubleVar()
-        # volume slider -- using lambda here so I can pass in parameters
         volume_slider = ttk.Scale(root, from_=0, to=100, variable=vol, orient='vertical', command=lambda x: player.set_vol(vol.get())).place(x=10, y=30)
 
-        # time slider
+        # TIME SLIDER
         vtime = tk.IntVar()
         # TODO -- dragging slider changes player's songtime and updates song duration, but doesn't display curr time
         time_slider = ttk.Scale(root, from_=0, to=player.songduration, orient='horizontal', length=240,
@@ -67,24 +85,25 @@ class Main(tk.Tk):
                                 command=lambda x: player.player.seek(vtime.get()))
         time_slider.place(x=10, y=190)
 
-        # creating the menu
+        # MENU CREATION
         menu = tk.Menu(root)
         root.config(menu=menu)
-        media_tab = tk.Menu(menu)  # the file tab
+        media_tab = tk.Menu(menu)  # the media tab
         settings = tk.Menu(menu)  # the settings tab
         menu.add_cascade(label="Media", menu=media_tab)
         menu.add_cascade(label="Settings", menu=settings)
+
         # file tab layout
         media_tab.add_command(label="Open File...", command=lambda: self.open_file(player, time_slider))
         media_tab.add_command(label="Open Multiple Files...", command=lambda: self.open_files(player, time_slider))
         media_tab.add_command(label="Open Playlist...", command=lambda: self.open_playlist(player, time_slider))
         media_tab.add_separator()
         media_tab.add_command(label="Exit", command=lambda: self.exit(root))
+
         # settings tab layout
         settings.add_command(label="General", command=self.open_settings)
         settings.add_command(label="Radio")
 
-        root['bg'] = 'white'
         root.mainloop()
 
     # shuffle and play a playlist
@@ -103,7 +122,7 @@ class Main(tk.Tk):
                 player.player.queue(src)
         player.play()
 
-    # open single file
+    # open and load single file
     def open_file(self, player, time_slider):
         filename = fd.askopenfilename()
         path = str(filename)
@@ -115,7 +134,7 @@ class Main(tk.Tk):
         player.play_media()
         time_slider.config(to=player.songduration)
 
-    # open multiple files
+    # open and load multiple files
     def open_files(self, player, time_slider):
         files = fd.askopenfilenames()
         # check file legitimacy
@@ -129,7 +148,7 @@ class Main(tk.Tk):
         player.play()
         # player.player.next_source()
 
-    # open a playlist (a folder)
+    # open and load a playlist
     def open_playlist(self, player, time_slider):
         folder = fd.askdirectory()
         for root, dirs, files in os.walk(folder):
@@ -142,6 +161,7 @@ class Main(tk.Tk):
                 player.player.queue(src)
         player.play()
 
+    # launch the settings window
     def open_settings(self):
         settings_app = Settings(tk.Tk())
         settings_app.mainloop()
@@ -154,30 +174,15 @@ class Main(tk.Tk):
         print(total_sec)
         return total_sec
 
+    # exit Avideom
     def exit(self, root):
         root.destroy()
         sys.exit()
 
 
-# Popup window for playlist creation
-class PopupEntry(tk.Tk):
-    def __init__(self, root):
-        top = self.top = tk.Toplevel(root)
-        self.value = ''
-        self.root = root
-        self.l = tk.Label(top, text='Enter playlist name:')
-        self.l.pack()
-        self.e = tk.Entry(top)
-        self.e.pack()
-        self.b = tk.Button(top, text='Ok', command=self.destroy)
-        self.b.pack()
-
-    def destroy(self):
-        self.value = self.e.get()
-        self.top.destroy()
-
-
+# settings window to allow user to edit various app settings
 # TODO -- come up with more settings for user to edit
+# ---- option to edit jump distance for FF/rev
 class Settings(tk.Tk):
     def __init__(self, root):
         self.root = root
@@ -195,6 +200,7 @@ class Settings(tk.Tk):
 
         root.mainloop()
 
+    # create and store a playlist in /playlists
     def create_playlist(self):
         # ask for name -- display error and exit settings if playlist name already exists
         self.playlist_name = simpledialog.askstring('Avideom', 'Enter playlist name:')
@@ -207,7 +213,7 @@ class Settings(tk.Tk):
                 self.root.destroy()
                 return
 
-            # TODO -- if user cancels dialog, exit out to main app
+            # creation and storage
             files = fd.askopenfilenames()
             for filename in files:
                 path = str(filename)
@@ -219,6 +225,7 @@ class Settings(tk.Tk):
             self.root.destroy()
         return
 
+    # launch window for editing playlists
     def edit_playlist(self):
         try:
             edit_app = PlaylistEdit(tk.Tk())
@@ -227,14 +234,17 @@ class Settings(tk.Tk):
             print()
         return
 
+    # TODO
     def on_equalizer(self):
         return
 
+    # change playlist name
     def set_playlist_name(self, pname):
         self.playlist_name = pname
 
 
 # Window for editing playlists
+# TODO -- add option to change playlist name
 class PlaylistEdit(tk.Tk):
     def __init__(self, root):
         self.root = root
@@ -245,10 +255,12 @@ class PlaylistEdit(tk.Tk):
         s.configure('TOptionMenu', background='white')
         playlists = os.listdir(AVIDEOM_DIR + '/playlists/')
 
+        # to have a default value display for the dropdown
         var = tk.StringVar(root)
         var.set(playlists[0])
         var.trace('w', self.change_dropdown)
 
+        # dropdown menu to select a playlist to edit
         w = ttk.OptionMenu(root, var, playlists[0], *playlists)
         tk.Label(root, text='Choose playlist to edit:', bg='white').place(x=10, y=10)
         w.place(x=10, y=30)
@@ -259,9 +271,11 @@ class PlaylistEdit(tk.Tk):
         dlt_btn = tk.Button(root, text='Delete', bg='white', borderwidth=1, command=lambda: self.on_delete(var.get()))
         dlt_btn.place(x=10, y=90)
 
+    # for some reason, the window does not work without this function
     def change_dropdown(self, *args):
         return
 
+    # launch the second playlist editing menu
     def on_edit(self, playlist):
         try:
             edit_app = PlaylistEdit2(tk.Tk(), playlist)
@@ -269,11 +283,13 @@ class PlaylistEdit(tk.Tk):
         except RecursionError:
             print()
 
+    # delete the selected playlist
     def on_delete(self, playlist):
         path = AVIDEOM_DIR + '/playlists/' + playlist
         shutil.rmtree(path)
 
 
+# a second window for editing a specific playlist
 class PlaylistEdit2(tk.Tk):
     def __init__(self, root, playlist):
         self.root = root
@@ -294,6 +310,7 @@ class PlaylistEdit2(tk.Tk):
         dlt = tk.Button(root, text='Delete song', bg='white', borderwidth=1,
                         command=lambda: self.del_song(var.get())).place(x=10, y=90)
 
+    # add selected song to playlist
     def add_song(self):
         filename = fd.askopenfilename()
         path = str(filename)
@@ -303,11 +320,14 @@ class PlaylistEdit2(tk.Tk):
             sys.exit()
         shutil.copy2(path, self.playlist_path)
 
+    # delete selected song from playlist
     def del_song(self, song):
         os.remove(self.playlist_path + '/' + song)
 
+    # still not sure why this is required
     def change_dropdown(self, *args):
         return
+
 
 # Create a tooltip for any given widget
 # From https://www.daniweb.com/programming/software-development/code/484591/a-tooltip-class-for-tkinter
