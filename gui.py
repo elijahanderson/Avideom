@@ -14,7 +14,8 @@ import backend
 
 # CHANGES FOR CHECKPOINT 3:
 #   - implement hovering tool tips [x]
-#   - display song title and artist on GUI [ ]
+#   - display song title and artist on GUI [x]
+#   - implement radio streaming abilities [ ]
 
 # root directory of Avideom
 AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,6 +40,12 @@ class Main(tk.Tk):
         # [some standard media player functionalities] #
         ################################################
 
+        # SONG & ARTIST DISPLAY
+        display = tk.StringVar()
+        display.set('Now playing...')
+        self.l1 = tk.Label(root, textvariable=display, bg='white')
+        self.l1.place(x=130, y=50, anchor='center')
+
         # PLAY
         play = tk.PhotoImage(file='bitmaps/player_play.png')
         w2 = tk.Button(root, image=play, command=player.play, borderwidth=0)
@@ -52,10 +59,10 @@ class Main(tk.Tk):
         w3tt = CreateToolTip(w3, 'Pause')
 
         # NEXT SOURCE
-        next = tk.PhotoImage(file='bitmaps/player_next.png')
+        next_btn = tk.PhotoImage(file='bitmaps/player_next.png')
         # TODO -- put command in its own function and wrap a try-catch loop around it
         # IndexError when no sources queued up
-        w4 = tk.Button(root, image=next, command=player.player.next_source, borderwidth=0)
+        w4 = tk.Button(root, image=next_btn, command=lambda: self.next_source(player, display), borderwidth=0)
         w4.place(x=110, y=150)
         w4tt = CreateToolTip(w4, 'Skip')
 
@@ -90,12 +97,6 @@ class Main(tk.Tk):
                                 command=lambda x: player.player.seek(vtime.get()))
         time_slider.place(x=10, y=190)
 
-        # SONG & ARTIST DISPLAY
-        display = tk.StringVar()
-        display.set('Now playing...')
-        self.l1 = tk.Label(root, textvariable=display, bg='white')
-        self.l1.place(x=130, y=50, anchor='center')
-
         # MENU CREATION
         menu = tk.Menu(root)
         root.config(menu=menu)
@@ -106,8 +107,8 @@ class Main(tk.Tk):
 
         # file tab layout
         media_tab.add_command(label="Open File...", command=lambda: self.open_file(player, time_slider, display))
-        media_tab.add_command(label="Open Multiple Files...", command=lambda: self.open_files(player, time_slider))
-        media_tab.add_command(label="Open Playlist...", command=lambda: self.open_playlist(player, time_slider))
+        media_tab.add_command(label="Open Multiple Files...", command=lambda: self.open_files(player, time_slider, display))
+        media_tab.add_command(label="Open Playlist...", command=lambda: self.open_playlist(player, time_slider, display))
         media_tab.add_separator()
         media_tab.add_command(label="Exit", command=lambda: self.exit(root))
 
@@ -148,7 +149,7 @@ class Main(tk.Tk):
         self.change_display(display, player)
 
     # open and load multiple files
-    def open_files(self, player, time_slider):
+    def open_files(self, player, time_slider, display):
         files = fd.askopenfilenames()
         # check file legitimacy
         for filename in files:
@@ -159,10 +160,10 @@ class Main(tk.Tk):
             src = media.load(path, streaming=True)
             player.player.queue(src)
         player.play()
-        # player.player.next_source()
+        self.change_display(display, player)
 
     # open and load a playlist
-    def open_playlist(self, player, time_slider):
+    def open_playlist(self, player, time_slider, display):
         folder = fd.askdirectory()
         for root, dirs, files in os.walk(folder):
             for filename in files:
@@ -173,6 +174,7 @@ class Main(tk.Tk):
                 src = media.load(path, streaming=True)
                 player.player.queue(src)
         player.play()
+        self.change_display(display, player)
 
     # launch the settings window
     def open_settings(self):
@@ -194,14 +196,21 @@ class Main(tk.Tk):
 
     # change song & artist display
     def change_display(self, label, player):
-        # src = player.source
-        # title = src.info.title
-        # artist = src.info.author
-        label.set(player.player.source.info.author)
+        src = player.player.source
+        title = src.info.title.decode('utf-8')
+        artist = src.info.author.decode('utf-8')
+        if title == '':
+            title = player.path.split('/')[-1][:-4]
+        artist = '[Artist not found]' if artist == '' else artist
+        nstr = title + '\nby ' + artist
+        label.set(nstr)
         self.root.update()
-        self.root.after(500, self.change_display(label, player))
-        # self.l1.configure(text=title+'\n'+artist)
-        # self.l1.after(100, self.change_display(label, player))
+        return
+
+    # play the next source and change the song display
+    def next_source(self, player, label):
+        player.player.next_source()
+        self.change_display(label, player)
         return
 
 
