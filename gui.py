@@ -12,6 +12,10 @@ from tkinter import simpledialog
 # personal imports
 import backend
 
+# CHANGES FOR CHECKPOINT 3:
+#   - implement hovering tool tips [x]
+#   - display song title and artist on GUI [ ]
+
 # root directory of Avideom
 AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -75,7 +79,8 @@ class Main(tk.Tk):
 
         # VOLUME SLIDER -- using lambda is used to pass parameters without running the fnc upon app start
         vol = tk.DoubleVar()
-        volume_slider = ttk.Scale(root, from_=0, to=100, variable=vol, orient='vertical', command=lambda x: player.set_vol(vol.get())).place(x=10, y=30)
+        volume_slider = ttk.Scale(root, from_=0, to=100, variable=vol, orient='vertical',
+                                  command=lambda x: player.set_vol(vol.get())).place(x=10, y=30)
 
         # TIME SLIDER
         vtime = tk.IntVar()
@@ -84,6 +89,12 @@ class Main(tk.Tk):
                                 variable=vtime,
                                 command=lambda x: player.player.seek(vtime.get()))
         time_slider.place(x=10, y=190)
+
+        # SONG & ARTIST DISPLAY
+        display = tk.StringVar()
+        display.set('Now playing...')
+        self.l1 = tk.Label(root, textvariable=display, bg='white')
+        self.l1.place(x=130, y=50, anchor='center')
 
         # MENU CREATION
         menu = tk.Menu(root)
@@ -94,7 +105,7 @@ class Main(tk.Tk):
         menu.add_cascade(label="Settings", menu=settings)
 
         # file tab layout
-        media_tab.add_command(label="Open File...", command=lambda: self.open_file(player, time_slider))
+        media_tab.add_command(label="Open File...", command=lambda: self.open_file(player, time_slider, display))
         media_tab.add_command(label="Open Multiple Files...", command=lambda: self.open_files(player, time_slider))
         media_tab.add_command(label="Open Playlist...", command=lambda: self.open_playlist(player, time_slider))
         media_tab.add_separator()
@@ -104,6 +115,7 @@ class Main(tk.Tk):
         settings.add_command(label="General", command=self.open_settings)
         settings.add_command(label="Radio")
 
+        # self.change_display(display, player.player)
         root.mainloop()
 
     # shuffle and play a playlist
@@ -123,7 +135,7 @@ class Main(tk.Tk):
         player.play()
 
     # open and load single file
-    def open_file(self, player, time_slider):
+    def open_file(self, player, time_slider, display):
         filename = fd.askopenfilename()
         path = str(filename)
         # check file legitimacy
@@ -133,6 +145,7 @@ class Main(tk.Tk):
         player.set_path(path)
         player.play_media()
         time_slider.config(to=player.songduration)
+        self.change_display(display, player)
 
     # open and load multiple files
     def open_files(self, player, time_slider):
@@ -178,6 +191,18 @@ class Main(tk.Tk):
     def exit(self, root):
         root.destroy()
         sys.exit()
+
+    # change song & artist display
+    def change_display(self, label, player):
+        # src = player.source
+        # title = src.info.title
+        # artist = src.info.author
+        label.set(player.player.source.info.author)
+        self.root.update()
+        self.root.after(500, self.change_display(label, player))
+        # self.l1.configure(text=title+'\n'+artist)
+        # self.l1.after(100, self.change_display(label, player))
+        return
 
 
 # settings window to allow user to edit various app settings
