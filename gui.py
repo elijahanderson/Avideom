@@ -51,6 +51,7 @@ class Main(tk.Tk):
         w2 = tk.Button(root, image=play, command=player.play, borderwidth=0)
         w2.place(x=10, y=150)
         w2tt = CreateToolTip(w2, 'Play')
+        root.bind('<space>', player.play)
 
         # PAUSE
         pause = tk.PhotoImage(file='bitmaps/player_pause.png')

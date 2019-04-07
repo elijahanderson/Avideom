@@ -44,7 +44,7 @@ class MediaPlayer:
         return
 
     # play/continue the track
-    def play(self):
+    def play(self, event=None):
         print('playing song...')
         self.player.play()
         print('...')
