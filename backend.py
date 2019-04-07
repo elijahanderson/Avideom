@@ -37,7 +37,7 @@ class MediaPlayer:
         return currtime
 
     # pause the track
-    def pause(self):
+    def pause(self, event=None):
         print('pausing...')
         self.player.pause()
         print('...')
@@ -118,7 +118,7 @@ class MediaPlayer:
         return k
 
     # fast forward current source according to the jump distance
-    def fast_forward(self):
+    def fast_forward(self, event=None):
         time = self.player.time + jump_distance
         try:
             if self.duration() > time:
@@ -129,7 +129,7 @@ class MediaPlayer:
             pass
 
     # rewind current source according to the jump distance
-    def rewind(self):
+    def rewind(self, event=None):
         time = self.player.time - jump_distance
         print('rewinding...')
         try:

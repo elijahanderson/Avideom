@@ -16,6 +16,8 @@ import backend
 #   - implement hovering tool tips [x]
 #   - display song title and artist on GUI [x]
 #   - implement radio streaming abilities [ ]
+#   - add hotkeys [x]
+#   - add help menu [ ]
 
 # root directory of Avideom
 AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -51,7 +53,6 @@ class Main(tk.Tk):
         w2 = tk.Button(root, image=play, command=player.play, borderwidth=0)
         w2.place(x=10, y=150)
         w2tt = CreateToolTip(w2, 'Play')
-        root.bind('<space>', player.play)
 
         # PAUSE
         pause = tk.PhotoImage(file='bitmaps/player_pause.png')
@@ -103,8 +104,10 @@ class Main(tk.Tk):
         root.config(menu=menu)
         media_tab = tk.Menu(menu)  # the media tab
         settings = tk.Menu(menu)  # the settings tab
+        help_tab = tk.Menu(menu)
         menu.add_cascade(label="Media", menu=media_tab)
         menu.add_cascade(label="Settings", menu=settings)
+        menu.add_cascade(label='Help', menu=help_tab)
 
         # file tab layout
         media_tab.add_command(label="Open File...", command=lambda: self.open_file(player, time_slider, display))
@@ -115,13 +118,30 @@ class Main(tk.Tk):
 
         # settings tab layout
         settings.add_command(label="General", command=self.open_settings)
-        settings.add_command(label="Radio")
+        settings.add_command(label="Radio", command=self.open_radio)
+
+        # help tab layout
+        help_tab.add_command(label='Hotkeys', command=self.open_hotkeys)
+        help_tab.add_command(label='About Avideom', command=self.open_about)
+
+        # HOTKEY BINDING
+        root.bind('<space>', player.play)
+        root.bind('p', player.pause)
+        root.bind('<Right>', lambda event: self.next_source(player, display))
+        root.bind('<Control-Right>', player.fast_forward)
+        root.bind('<Control-Left>', player.rewind)
+        root.bind('<Control-s>', lambda event: self.shuffle(player))
+        root.bind('<Alt-s>', self.open_settings)
+        root.bind('<Alt-r>', self.open_radio)
+        root.bind('<Alt-o>', lambda event: self.open_file(player, time_slider, display))
+        root.bind('<Alt-p>', lambda event: self.open_playlist(player, time_slider, display))
+        root.bind('<Alt-m>', lambda event: self.open_files(player, time_slider, display))
 
         # self.change_display(display, player.player)
         root.mainloop()
 
     # shuffle and play a playlist
-    def shuffle(self, player):
+    def shuffle(self, player, event=None):
         folder = fd.askdirectory()
         for root, dirs, files in os.walk(folder):
             print(files)
@@ -137,7 +157,7 @@ class Main(tk.Tk):
         player.play()
 
     # open and load single file
-    def open_file(self, player, time_slider, display):
+    def open_file(self, player, time_slider, display, event=None):
         filename = fd.askopenfilename()
         path = str(filename)
         # check file legitimacy
@@ -178,7 +198,7 @@ class Main(tk.Tk):
         self.change_display(display, player)
 
     # launch the settings window
-    def open_settings(self):
+    def open_settings(self, event=None):
         settings_app = Settings(tk.Tk())
         settings_app.mainloop()
 
@@ -209,10 +229,72 @@ class Main(tk.Tk):
         return
 
     # play the next source and change the song display
-    def next_source(self, player, label):
+    def next_source(self, player, label, event=None):
         player.player.next_source()
         self.change_display(label, player)
         return
+
+    def open_radio(self):
+        return
+
+    def open_about(self):
+        about_app = About(tk.Tk())
+        about_app.mainloop()
+        return
+
+    def open_hotkeys(self):
+        hk_app = Hotkeys(tk.Tk())
+        hk_app.mainloop()
+        return
+
+class About(tk.Tk):
+    def __init__(self, root):
+        self.root = root
+        root.geometry('130x200+30+30')
+        root.title('About Avideom')
+        root['bg'] = 'white'
+        self.display = tk.Label(root, bg='white', text='Avideom is an open-source desktop media player application\n'
+                                                       'created as my senior project.\n'
+                                                       'This project consists of the implementation of an open-source\n'
+                                                       'desktop media player application. Avideom is able to play both\n'
+                                                       'audio and video media files (such as .mp3, .wav, .mp4, .mov,\n'
+                                                       'etc.) directly from the user’s files. It is designed as a \n'
+                                                       'better alternative to the Windows Media Player, the default\n'
+                                                       'media player application on Windows operating systems. '
+                                                       'Once a user runs Avideom, he or she can select any audio '
+                                                       '\nor video file with a recognized file extension and it will '
+                                                       '\nplay the corresponding media. Avideom features a clean and '
+                                                       'intuitive GUI and all standard media player functions\n'
+                                                       '(pause, play, skip, volume control, etc.), and potentially\n'
+                                                       'bonus features such as visualizations, an EQ tuner, or\n'
+                                                       'different playback speeds. Avideom uses the Python programming '
+                                                       '\nlanguage as well as a number of its libraries to accomplish\n'
+                                                       'the above tasks. It can be downloaded for free online.')
+        self.display.place(x=10, y=10)
+        root.mainloop()
+
+
+class Hotkeys(tk.Tk):
+    def __init__(self, root):
+        self.root = root
+        root.geometry('130x200+30+30')
+        root.title('Hotkeys')
+        root['bg'] = 'white'
+
+        self.display = tk.Listbox(root, bg='white')
+        self.display.insert(1, 'Play.............<Space>')
+        self.display.insert(1, 'Pause............<P>')
+        self.display.insert(1, 'Skip.............<Right Arrow>')
+        self.display.insert(1, 'Fast Forward.....<Crtl+Right Arrow>')
+        self.display.insert(1, 'Reverse..........<Crtl+Left Arrow>')
+        self.display.insert(1, 'Shuffle..........<Ctrl+S>')
+        self.display.insert(1, 'Settings.........<Alt+S>')
+        self.display.insert(1, 'Open File........<Alt+O>')
+        self.display.insert(1, 'Open Files.......<Alt+M>')
+        self.display.insert(1, 'Open Playlist....<Alt+P>')
+        self.display.place(x=10, y=10)
+
+        root.mainloop()
 
 
 # settings window to allow user to edit various app settings
