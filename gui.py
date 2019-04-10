@@ -17,7 +17,7 @@ import backend
 #   - display song title and artist on GUI [x]
 #   - implement radio streaming abilities [ ]
 #   - add hotkeys [x]
-#   - add help menu [ ]
+#   - add help menu [x]
 
 # root directory of Avideom
 AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -250,20 +250,21 @@ class Main(tk.Tk):
 class About(tk.Tk):
     def __init__(self, root):
         self.root = root
-        root.geometry('130x200+30+30')
+        root.geometry('530x330+30+30')
         root.title('About Avideom')
         root['bg'] = 'white'
-        self.display = tk.Label(root, bg='white', text='Avideom is an open-source desktop media player application\n'
-                                                       'created as my senior project.\n'
+        self.display = tk.Text(root, bg='white')
+        self.display.insert('insert', 'Avideom is an open-source desktop media player application\n'
+                                                       'created as my senior project.\n\n'
                                                        'This project consists of the implementation of an open-source\n'
                                                        'desktop media player application. Avideom is able to play both\n'
                                                        'audio and video media files (such as .mp3, .wav, .mp4, .mov,\n'
                                                        'etc.) directly from the user’s files. It is designed as a \n'
                                                        'better alternative to the Windows Media Player, the default\n'
-                                                       'media player application on Windows operating systems. '
+                                                       'media player application on Windows operating systems.\n\n'
                                                        'Once a user runs Avideom, he or she can select any audio '
                                                        '\nor video file with a recognized file extension and it will '
-                                                       '\nplay the corresponding media. Avideom features a clean and '
+                                                       '\nplay the corresponding media. Avideom features a clean and\n'
                                                        'intuitive GUI and all standard media player functions\n'
                                                        '(pause, play, skip, volume control, etc.), and potentially\n'
                                                        'bonus features such as visualizations, an EQ tuner, or\n'
@@ -277,21 +278,21 @@ class About(tk.Tk):
 class Hotkeys(tk.Tk):
     def __init__(self, root):
         self.root = root
-        root.geometry('130x200+30+30')
+        root.geometry('230x200+30+30')
         root.title('Hotkeys')
         root['bg'] = 'white'
 
-        self.display = tk.Listbox(root, bg='white')
+        self.display = tk.Listbox(root, bg='white', width=35, selectbackground='gray')
         self.display.insert(1, 'Play.............<Space>')
-        self.display.insert(1, 'Pause............<P>')
-        self.display.insert(1, 'Skip.............<Right Arrow>')
-        self.display.insert(1, 'Fast Forward.....<Crtl+Right Arrow>')
-        self.display.insert(1, 'Reverse..........<Crtl+Left Arrow>')
-        self.display.insert(1, 'Shuffle..........<Ctrl+S>')
-        self.display.insert(1, 'Settings.........<Alt+S>')
-        self.display.insert(1, 'Open File........<Alt+O>')
-        self.display.insert(1, 'Open Files.......<Alt+M>')
-        self.display.insert(1, 'Open Playlist....<Alt+P>')
+        self.display.insert(7, 'Settings.........<Alt+S>')
+        self.display.insert(8, 'Open File........<Alt+O>')
+        self.display.insert(9, 'Open Files.......<Alt+M>')
+        self.display.insert(10, 'Open Playlist....<Alt+P>')
+        self.display.insert(6, 'Skip.............<Right Arrow>')
+        self.display.insert(2, 'Pause............<P>')
+        self.display.insert(3, 'Fast Forward.....<Crtl+Right Arrow>')
+        self.display.insert(4, 'Reverse..........<Crtl+Left Arrow>')
+        self.display.insert(5, 'Shuffle..........<Ctrl+S>')
         self.display.place(x=10, y=10)
 
         root.mainloop()
