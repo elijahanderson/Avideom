@@ -1,13 +1,11 @@
 import os
 import pyglet.media as media
-import pyradio
 import shutil
 import sys
 import tkinter as tk
 import tkinter.filedialog as fd
 import tkinter.messagebox as mb
 import time
-import tty_radio
 from random import shuffle
 from tkinter import ttk
 from tkinter import simpledialog
