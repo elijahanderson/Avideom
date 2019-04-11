@@ -1,21 +1,24 @@
 import os
 import pyglet.media as media
+import pyradio
 import shutil
 import sys
 import tkinter as tk
 import tkinter.filedialog as fd
 import tkinter.messagebox as mb
 import time
+import tty_radio
 from random import shuffle
 from tkinter import ttk
 from tkinter import simpledialog
+import vlc
 # personal imports
 import backend
 
 # CHANGES FOR CHECKPOINT 3:
 #   - implement hovering tool tips [x]
 #   - display song title and artist on GUI [x]
-#   - implement radio streaming abilities [ ]
+#   - implement radio streaming abilities [sort of]
 #   - add hotkeys [x]
 #   - add help menu [x]
 
@@ -35,6 +38,7 @@ class Main(tk.Tk):
         root.geometry('260x230+30+30')
         root.title('Avideom')
         root['bg'] = 'white'
+        root.protocol('WM_DELETE_WINDOW', lambda: self.on_close(root, player))
         s = ttk.Style()
         s.configure('TScale', background='white', sliderlength=10)
 
@@ -105,8 +109,10 @@ class Main(tk.Tk):
         media_tab = tk.Menu(menu)  # the media tab
         settings = tk.Menu(menu)  # the settings tab
         help_tab = tk.Menu(menu)
+        radio = tk.Menu(menu)
         menu.add_cascade(label="Media", menu=media_tab)
         menu.add_cascade(label="Settings", menu=settings)
+        menu.add_cascade(label='Radio', menu=radio)
         menu.add_cascade(label='Help', menu=help_tab)
 
         # file tab layout
@@ -114,11 +120,13 @@ class Main(tk.Tk):
         media_tab.add_command(label="Open Multiple Files...", command=lambda: self.open_files(player, time_slider, display))
         media_tab.add_command(label="Open Playlist...", command=lambda: self.open_playlist(player, time_slider, display))
         media_tab.add_separator()
-        media_tab.add_command(label="Exit", command=lambda: self.exit(root))
+        media_tab.add_command(label="Exit", command=lambda: self.on_close(root))
 
         # settings tab layout
-        settings.add_command(label="General", command=self.open_settings)
-        settings.add_command(label="Radio", command=self.open_radio)
+        settings.add_command(label="Open Settings", command=self.open_settings)
+
+        # radio tab layout
+        radio.add_command(label="Launch Radio", command=self.open_radio)
 
         # help tab layout
         help_tab.add_command(label='Hotkeys', command=self.open_hotkeys)
@@ -211,7 +219,8 @@ class Main(tk.Tk):
         return total_sec
 
     # exit Avideom
-    def exit(self, root):
+    def on_close(self, root, player):
+        player.pause()
         root.destroy()
         sys.exit()
 
@@ -234,7 +243,9 @@ class Main(tk.Tk):
         self.change_display(label, player)
         return
 
-    def open_radio(self):
+    def open_radio(self, event=None):
+        radio_app = Radio(tk.Tk())
+        radio_app.mainloop()
         return
 
     def open_about(self):
@@ -246,6 +257,65 @@ class Main(tk.Tk):
         hk_app = Hotkeys(tk.Tk())
         hk_app.mainloop()
         return
+
+
+class Radio(tk.Tk):
+    def __init__(self, root):
+        self.root = root
+        self.url = ''
+        self.instance = vlc.Instance('--input-repeat=-1', '--fullscreen')
+        self.player_vlc = self.instance.media_player_new()
+        self.media = self.instance.media_new(self.url)
+
+        self.root.geometry('50x100+30+30')
+        self.root.title('Radio')
+        self.root['bg'] = 'white'
+        self.root.protocol('WM_DELETE_WINDOW', self.on_close)
+
+        b1 = tk.Button(self.root, text='Pop', bg='white', borderwidth=1, command=self.stream_pop)
+        b1.place(x=10, y=10)
+        b2 = tk.Button(self.root, text='Classic Rock', bg='white', borderwidth=1, command=self.stream_cr)
+        b2.place(x=10, y=40)
+        b3 = tk.Button(self.root, text='Sleep', bg='white', borderwidth=1, command=self.stream_s)
+        b3.place(x=10, y=70)
+
+        # play_img = tk.PhotoImage(file='bitmaps/player_play.png')
+        # b4 = tk.Button(root, image=play_img, command=self.rplay, borderwidth=0)
+        # b4.place(x=60, y=150)
+        # pause = tk.PhotoImage(file='bitmaps/player_pause.png')
+        # b5 = tk.Button(root, image=pause, command=self.rpause, borderwidth=0)
+        # b5.place(x=120, y=150)
+
+        self.root.mainloop()
+
+    def stream_pop(self):
+        self.url = 'http://ic7.101.ru:8000/c15_5'
+        self.rplay()
+
+    def stream_cr(self):
+        self.url = 'http://ic7.101.ru:8000/c15_1'
+        self.rplay()
+
+    def stream_s(self):
+        self.url = 'http://ic7.101.ru:8000/c15_3'
+        self.rplay()
+
+    def rplay(self):
+        self.media = self.instance.media_new(self.url)
+        self.media.get_mrl()
+        self.player_vlc.set_media(self.media)
+        self.player_vlc.play()
+
+    def rpause(self):
+        self.player_vlc.pause()
+
+    def rstop(self):
+        self.player_vlc.stop()
+
+    def on_close(self):
+        self.rstop()
+        self.root.destroy()
+
 
 class About(tk.Tk):
     def __init__(self, root):
