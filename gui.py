@@ -13,15 +13,14 @@ import vlc
 # personal imports
 import backend
 
-# CHANGES FOR CHECKPOINT 3:
-#   - implement hovering tool tips [x]
-#   - display song title and artist on GUI [x]
-#   - implement radio streaming abilities [sort of]
-#   - add hotkeys [x]
-#   - add help menu [x]
+# CHANGES FOR CHECKPOINT 4:
+#   - improve radio streaming abilities [ ]
+#   - allow users to add song names for display [ ]
+#   - make Avideom available as executable file [x]
+#   - general GUI tuning
 
 # root directory of Avideom
-AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
+AVIDEOM_DIR = os.path.dirname(os.path.abspath(os.__file__))
 
 
 class Main(tk.Tk):
@@ -51,19 +50,19 @@ class Main(tk.Tk):
         self.l1.place(x=130, y=50, anchor='center')
 
         # PLAY
-        play = tk.PhotoImage(file='bitmaps/player_play.png')
+        play = tk.PhotoImage(file='player_play.png')
         w2 = tk.Button(root, image=play, command=player.play, borderwidth=0)
         w2.place(x=10, y=150)
         w2tt = CreateToolTip(w2, 'Play')
 
         # PAUSE
-        pause = tk.PhotoImage(file='bitmaps/player_pause.png')
+        pause = tk.PhotoImage(file='player_pause.png')
         w3 = tk.Button(root, image=pause, command=player.pause, borderwidth=0)
         w3.place(x=60, y=150)
         w3tt = CreateToolTip(w3, 'Pause')
 
         # NEXT SOURCE
-        next_btn = tk.PhotoImage(file='bitmaps/player_next.png')
+        next_btn = tk.PhotoImage(file='player_next.png')
         # TODO -- put command in its own function and wrap a try-catch loop around it
         # IndexError when no sources queued up
         w4 = tk.Button(root, image=next_btn, command=lambda: self.next_source(player, display), borderwidth=0)
@@ -71,19 +70,19 @@ class Main(tk.Tk):
         w4tt = CreateToolTip(w4, 'Skip')
 
         # FAST FORWARD
-        ff = tk.PhotoImage(file='bitmaps/player_ff.png')
+        ff = tk.PhotoImage(file='player_ff.png')
         w5 = tk.Button(root, image=ff, command=player.fast_forward, borderwidth=0)
         w5.place(x=160, y=150)
         w5tt = CreateToolTip(w5, 'Fast foward')
 
         # REVERSE
-        rev = tk.PhotoImage(file='bitmaps/player_rev.png')
+        rev = tk.PhotoImage(file='player_rev.png')
         w6 = tk.Button(root, image=rev, command=player.rewind, borderwidth=0)
         w6.place(x=210, y=150)
         w6tt = CreateToolTip(w6, 'Reverse')
 
         # SHUFFLE AND PLAY
-        shuffle_btn = tk.PhotoImage(file='bitmaps/shuffle.png')
+        shuffle_btn = tk.PhotoImage(file='shuffle.png')
         w7 = tk.Button(root, image=shuffle_btn, command=lambda: self.shuffle(player), borderwidth=0)
         w7.place(x=210, y=100)
         w7tt = CreateToolTip(w7, 'Shuffle and play playlist')
