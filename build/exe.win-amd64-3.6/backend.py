@@ -3,9 +3,6 @@ import pyglet.media as media
 import threading
 import vlc
 
-# global var for fast forwarding/reverse speed
-jump_distance = 10
-
 
 # MediaPlayer -- a class that stores several functions to manipulate a song file
 class MediaPlayer:
@@ -17,6 +14,9 @@ class MediaPlayer:
         self.songduration = song_duration
         self.player = media.Player()    # the pyglet media player
         self.time_thread()              # time updating thread
+
+        # var for fast forwarding/reverse speed
+        self.jump_distance = 10
 
         # to keep the private fields and media player in sync
         # self.path.trace('w', self.play_song)
@@ -119,7 +119,7 @@ class MediaPlayer:
 
     # fast forward current source according to the jump distance
     def fast_forward(self, event=None):
-        time = self.player.time + jump_distance
+        time = self.player.time + self.jump_distance
         try:
             if self.duration() > time:
                 self.player.seek(time)
@@ -130,7 +130,7 @@ class MediaPlayer:
 
     # rewind current source according to the jump distance
     def rewind(self, event=None):
-        time = self.player.time - jump_distance
+        time = self.player.time - self.jump_distance
         print('rewinding...')
         try:
             self.player.seek(time)

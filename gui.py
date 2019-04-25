@@ -19,8 +19,10 @@ import backend
 #   - make Avideom available as executable file [x]
 #   - general GUI tuning
 #       - users can now edit playlist names [x]
+#       - create tool tips for all buttons [x]
 
 # root directory of Avideom
+# TODO -- doesn't work with executable file
 AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -277,6 +279,10 @@ class Radio(tk.Tk):
         b3 = tk.Button(self.root, text='Sleep', bg='white', borderwidth=1, command=self.stream_s)
         b3.place(x=10, y=70)
 
+        b1_tt = CreateToolTip(b1, '80s to current pop')
+        b2_tt = CreateToolTip(b2, 'Classic rock (not always live)')
+        b3_tt = CreateToolTip(b3, 'Relaxing sleep music')
+
         # play_img = tk.PhotoImage(file='bitmaps/player_play.png')
         # b4 = tk.Button(root, image=play_img, command=self.rplay, borderwidth=0)
         # b4.place(x=60, y=150)
@@ -373,18 +379,28 @@ class Settings(tk.Tk):
     def __init__(self, root):
         self.root = root
         self.playlist_name = ''
-        root.geometry('260x100+30+30')
+        root.geometry('260x130+30+30')
         root.title('General Settings')
         root['bg'] = 'white'
 
-        create_playlist = tk.Button(root, command=self.create_playlist, text='Create playlist', bg='white', borderwidth=1)\
-            .place(x=10, y=10)
-        edit_playlist = tk.Button(root, command=self.edit_playlist, text='Edit Playlist', bg='white', borderwidth=1)\
-            .place(x=10, y=40)
-        equalizer = tk.Button(root, command=self.on_equalizer, text='Equalizer', bg='white', borderwidth=1)\
-            .place(x=10, y=70)
+        create_playlist = tk.Button(root, command=self.create_playlist, text='Create playlist', bg='white', borderwidth=1)
+        create_playlist.place(x=10, y=10)
+        edit_playlist = tk.Button(root, command=self.edit_playlist, text='Edit playlist', bg='white', borderwidth=1)
+        edit_playlist.place(x=10, y=40)
+        equalizer = tk.Button(root, command=self.on_equalizer, text='Equalizer', bg='white', borderwidth=1)
+        equalizer.place(x=10, y=70)
+        edit_jump = tk.Button(root, command=self.edit_jump, text='Edit jump speed', bg='white', borderwidth=1)
+        edit_jump.place(x=10, y=100)
+        c_p_tt = CreateToolTip(create_playlist, 'Create a new playlist')
+        e_p_tt = CreateToolTip(edit_playlist, 'Edit an existing playlist')
+        eq_tt = CreateToolTip(equalizer, 'Equalizer (coming soon)')
+        jump_tt = CreateToolTip(edit_jump, 'Change how fast Avideom fast forwards/reverses')
 
         root.mainloop()
+
+    def edit_jump(self):
+        pjump = simpledialog.askinteger('Avideom', 'Enter new jump speed:')
+        return
 
     # create and store a playlist in /playlists
     def create_playlist(self):
@@ -452,13 +468,16 @@ class PlaylistEdit(tk.Tk):
 
         edit_btn = tk.Button(root, text='Edit', bg='white', borderwidth=1, command=lambda: self.on_edit(var.get()))
         edit_btn.place(x=10, y=60)
+        edit_tt = CreateToolTip(edit_btn, 'Edit selected playlist')
 
         dlt_btn = tk.Button(root, text='Delete', bg='white', borderwidth=1, command=lambda: self.on_delete(var.get()))
         dlt_btn.place(x=10, y=90)
+        dlt_tt = CreateToolTip(dlt_btn, 'Delete selected playlist')
 
         name_btn = tk.Button(root, text='Change Name', bg='white', borderwidth=1,
                              command=lambda: self.name_change(var.get()))
         name_btn.place(x=10, y=120)
+        name_tt = CreateToolTip(name_btn, 'Change name of selected playlist')
 
     # for some reason, the window does not work without this function
     def change_dropdown(self, *args):
