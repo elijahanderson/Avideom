@@ -18,9 +18,10 @@ import backend
 #   - allow users to add song names for display [ ]
 #   - make Avideom available as executable file [x]
 #   - general GUI tuning
+#       - users can now edit playlist names [x]
 
 # root directory of Avideom
-AVIDEOM_DIR = os.path.dirname(os.path.abspath(os.__file__))
+AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Main(tk.Tk):
@@ -429,12 +430,11 @@ class Settings(tk.Tk):
 
 
 # Window for editing playlists
-# TODO -- add option to change playlist name
 class PlaylistEdit(tk.Tk):
     def __init__(self, root):
         self.root = root
         root.title('Edit Playlist')
-        root.geometry('260x120+10+10')
+        root.geometry('260x150+10+10')
         root['bg'] = 'white'
         s = ttk.Style()
         s.configure('TOptionMenu', background='white')
@@ -456,6 +456,10 @@ class PlaylistEdit(tk.Tk):
         dlt_btn = tk.Button(root, text='Delete', bg='white', borderwidth=1, command=lambda: self.on_delete(var.get()))
         dlt_btn.place(x=10, y=90)
 
+        name_btn = tk.Button(root, text='Change Name', bg='white', borderwidth=1,
+                             command=lambda: self.name_change(var.get()))
+        name_btn.place(x=10, y=120)
+
     # for some reason, the window does not work without this function
     def change_dropdown(self, *args):
         return
@@ -472,6 +476,13 @@ class PlaylistEdit(tk.Tk):
     def on_delete(self, playlist):
         path = AVIDEOM_DIR + '/playlists/' + playlist
         shutil.rmtree(path)
+
+    # change the name of selected playlist
+    def name_change(self, playlist):
+        pname = simpledialog.askstring('Avideom', 'Enter new playlist name:')
+        os.rename(AVIDEOM_DIR + '/playlists/' + playlist, AVIDEOM_DIR + '/playlists/' + pname)
+
+        return
 
 
 # a second window for editing a specific playlist
