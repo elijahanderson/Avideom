@@ -72,7 +72,6 @@ class MediaPlayer:
         k = str(k)
         return k
 
-    # TODO -- delete this class and see if the app still runs
     def volume_(self, *args, **kwargs):
         try:
             volume = self.volume.get()

@@ -13,16 +13,7 @@ import vlc
 # personal imports
 import backend
 
-# CHANGES FOR CHECKPOINT 4:
-#   - improve radio streaming abilities [ ]
-#   - allow users to add song names for display [ ]
-#   - make Avideom available as executable file [x]
-#   - general GUI tuning
-#       - users can now edit playlist names [x]
-#       - create tool tips for all buttons [x]
-
 # root directory of Avideom
-# TODO -- doesn't work with executable file
 AVIDEOM_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -66,7 +57,6 @@ class Main(tk.Tk):
 
         # NEXT SOURCE
         next_btn = tk.PhotoImage(file='player_next.png')
-        # TODO -- put command in its own function and wrap a try-catch loop around it
         # IndexError when no sources queued up
         w4 = tk.Button(root, image=next_btn, command=lambda: self.next_source(player, display), borderwidth=0)
         w4.place(x=110, y=150)
@@ -97,7 +87,6 @@ class Main(tk.Tk):
 
         # TIME SLIDER
         vtime = tk.IntVar()
-        # TODO -- dragging slider changes player's songtime and updates song duration, but doesn't display curr time
         time_slider = ttk.Scale(root, from_=0, to=player.songduration, orient='horizontal', length=240,
                                 variable=vtime,
                                 command=lambda x: player.player.seek(vtime.get()))
@@ -373,8 +362,6 @@ class Hotkeys(tk.Tk):
 
 
 # settings window to allow user to edit various app settings
-# TODO -- come up with more settings for user to edit
-# ---- option to edit jump distance for FF/rev
 class Settings(tk.Tk):
     def __init__(self, root):
         self.root = root
