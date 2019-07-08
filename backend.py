@@ -170,3 +170,6 @@ class MediaPlayer:
     def set_path(self, npath):
         self.path = npath
         return
+
+    def get_path(self):
+        return self.path

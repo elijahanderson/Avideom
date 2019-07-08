@@ -99,10 +99,12 @@ class Main(tk.Tk):
         settings = tk.Menu(menu)  # the settings tab
         help_tab = tk.Menu(menu)
         radio = tk.Menu(menu)
+        visual_tab = tk.Menu(menu)
         menu.add_cascade(label="Media", menu=media_tab)
         menu.add_cascade(label="Settings", menu=settings)
         menu.add_cascade(label='Radio', menu=radio)
         menu.add_cascade(label='Help', menu=help_tab)
+        menu.add_cascade(label='Visualizer', menu=visual_tab)
 
         # file tab layout
         media_tab.add_command(label="Open File...", command=lambda: self.open_file(player, time_slider, display))
@@ -112,14 +114,17 @@ class Main(tk.Tk):
         media_tab.add_command(label="Exit", command=lambda: self.on_close(root))
 
         # settings tab layout
-        settings.add_command(label="Open Settings", command=self.open_settings)
+        settings.add_command(label="Open Settings...", command=self.open_settings)
 
         # radio tab layout
-        radio.add_command(label="Launch Radio", command=self.open_radio)
+        radio.add_command(label="Launch Radio...", command=self.open_radio)
 
         # help tab layout
-        help_tab.add_command(label='Hotkeys', command=self.open_hotkeys)
-        help_tab.add_command(label='About Avideom', command=self.open_about)
+        help_tab.add_command(label='Open Hotkeys...', command=self.open_hotkeys)
+        help_tab.add_command(label='About Avideom...', command=self.open_about)
+
+        # visualizer tab layout
+        visual_tab.add_command(label='Open Visualizer...', command=lambda: self.open_visualizer(player))
 
         # HOTKEY BINDING
         root.bind('<space>', player.play)
@@ -198,6 +203,11 @@ class Main(tk.Tk):
     def open_settings(self, event=None):
         settings_app = Settings(tk.Tk())
         settings_app.mainloop()
+
+    # launch the visualizer
+    def open_visualizer(self, player, event=None):
+        visualizer_app = Visualizer(tk.Tk(), player)
+        visualizer_app.mainloop()
 
     # to convert between actual no. seconds and display time
     def conv_time(self, disp_time):
@@ -357,6 +367,31 @@ class Hotkeys(tk.Tk):
         self.display.insert(4, 'Reverse..........<Crtl+Left Arrow>')
         self.display.insert(5, 'Shuffle..........<Ctrl+S>')
         self.display.place(x=10, y=10)
+
+        root.mainloop()
+
+
+# creating a new window for the visualizer
+class Visualizer(tk.Tk):
+    def __init__(self, root, player):
+        self.path = player.get_path()
+        self.root = root
+        root.geometry('260x130+30+30')
+        root.title('Visualizer')
+        root['bg'] = 'white'
+
+        src = media.load(self.path, streaming=True)
+        fmt = src.audio_format
+        sample_rate = fmt.sample_rate
+        sample_size = fmt.sample_size
+
+        data = src.get_audio_data(10000000000000000)
+        audio_data = data.data
+        audio_blength = data.length  # size of sample data in bytes
+        timestamp = data.timestamp
+        duration = src.duration
+        events = data.events
+        print('Format:', fmt, '\nData:', audio_data, '\nSize:', audio_blength, '\nDuration:', duration, '\n', events)
 
         root.mainloop()
 
