@@ -1,6 +1,8 @@
 import os
+from pydub import AudioSegment
 import pyglet.media as media
 import shutil
+import struct
 import sys
 import tkinter as tk
 import tkinter.filedialog as fd
@@ -385,13 +387,22 @@ class Visualizer(tk.Tk):
         sample_rate = fmt.sample_rate
         sample_size = fmt.sample_size
 
-        data = src.get_audio_data(10000000000000000)
-        audio_data = data.data
-        audio_blength = data.length  # size of sample data in bytes
-        timestamp = data.timestamp
+        sound = AudioSegment.from_mp3(self.path)
+        audio_data = sound.raw_data
+        nframes = sound.frame_count()
+        # audio_blength = data.length  # size of sample data in bytes
+        # timestamp = data.timestamp
         duration = src.duration
-        events = data.events
-        print('Format:', fmt, '\nData:', audio_data, '\nSize:', audio_blength, '\nDuration:', duration, '\n', events)
+        # events = data.events
+        print('Format:', fmt)
+        time.sleep(20)
+        # print('\nData:', audio_data) #, '\nSize:', audio_blength, '\nDuration:', duration, '\n', events)
+
+        unpack_fmt = str(sys.getsizeof(audio_data)) + 'B'
+        print(unpack_fmt)
+        sound_data = struct.unpack(unpack_fmt, audio_data)
+        # TODO WHY WONT YOU FUCKING WORK
+        print(sound_data)
 
         root.mainloop()
 
